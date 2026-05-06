@@ -46,28 +46,25 @@ if keyword:
         data = pytrends.interest_over_time()
 
         if not data.empty:
-            st.subheader("📈 Trend Chart")
-            st.line_chart(data[keyword])
+    st.subheader("📈 Trend Chart")
+    st.line_chart(data[keyword])
 
-            score = int(data[keyword].mean())
+    score = int(data[keyword].mean())
 
-            st.subheader("📊 Trend Score")
-            st.metric("Average Interest", score)
+    st.subheader("📊 Trend Score")
 
-            st.subheader("💰 Economic Insight")
+    col1, col2 = st.columns(2)
 
-           col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Score", score)
 
-with col1:
-    st.metric("📊 Trend Score", score)
-
-with col2:
-    if score > 75:
-        st.success("🔥 High Demand")
-    elif score > 50:
-        st.info("📈 Growing Trend")
-    else:
-        st.warning("⚖️ Low Momentum")
+    with col2:
+        if score > 75:
+            st.success("🔥 High Demand")
+        elif score > 50:
+            st.info("📈 Growing Trend")
+        else:
+            st.warning("⚖️ Low Momentum")
         else:
             st.warning("No trend data found. Try another keyword.")
 
