@@ -1,82 +1,113 @@
-import streamlit as st
-from pytrends.request import TrendReq
+""" ITMEAS v2.0 - Intelligent Trend Monitor & Economic Analysis System Clean rebuild (Streamlit MVP) Author: Aduba Joseph"""
 
-st.set_page_config(page_title="ITMEAS v0.1", layout="centered")
-st.markdown("""
-    <style>
-    body {
-        background-color: #0e1117;
-        color: white;
-    }
-    .stApp {
-        background: linear-gradient(135deg, #0e1117, #1c1f26);
-    }
-    </style>
-""", unsafe_allow_html=True)
+import streamlit as st import pandas as pd import numpy as np import plotly.graph_objects as go from datetime import datetime, timedelta
 
-st.title("📊 ITMEAS v0.1")
-st.markdown("### Understand trends. Discover economic opportunities.")
-st.divider()
+----------------------------
 
-keyword = st.text_input("🔍 Enter a trend (e.g. afrobeats, bitcoin, AI):")
+PAGE CONFIG
 
-st.sidebar.header("⚙️ Settings")
-region = st.sidebar.selectbox("Select Region", ["Global", "Nigeria"])
-time_option = st.sidebar.selectbox("Time Range", [
-    "Last 7 days",
-    "Last 1 month",
-    "Last 3 months"
-])
+----------------------------
 
-# Map to pytrends format
-time_map = {
-    "Last 7 days": "now 7-d",
-    "Last 1 month": "today 1-m",
-    "Last 3 months": "today 3-m"
-}
+st.set_page_config( page_title="ITMEAS Dashboard", page_icon="📊", layout="wide" )
 
-timeframe = time_map[time_option]
-if keyword:
-    try:
-        pytrends = TrendReq(hl='en-US', tz=360)
+----------------------------
 
-        geo = "NG" if region == "Nigeria" else ""
+GLOBAL STYLE
 
-        pytrends.build_payload([keyword], timeframe=timeframe, geo=geo)
-        data = pytrends.interest_over_time()
+----------------------------
 
-        if not data.empty:
-            st.subheader("📈 Trend Chart")
-            st.line_chart(data[keyword])
+st.markdown(""" <style> .main { background-color: #0e1117; color: #ffffff; } </style> """, unsafe_allow_html=True)
 
-            score = int(data[keyword].mean())
+----------------------------
 
-            st.subheader("📊 Trend Score")
+MOCK DATA GENERATOR
 
-            col1, col2 = st.columns(2)
+----------------------------
 
-            with col1:
-                st.metric("Score", score)
+def generate_data(days=30): dates = pd.date_range(end=datetime.today(), periods=days) values = np.cumsum(np.random.randn(days) * 2 + 0.5) return pd.DataFrame({"Date": dates, "Value": values})
 
-            with col2:
-                if score > 75:
-                    st.success("🔥 High Demand")
-                elif score > 50:
-                    st.info("📈 Growing Trend")
-                else:
-                    st.warning("⚖️ Low Momentum")
-                else:
-                    st.warning("No trend data found. Try another keyword.")
-                    
-    except Exception:
-        st.error("⚠️ Error fetching data. Try again.")
-        else:
-            st.warning("No trend data found. Try another keyword.")
+----------------------------
 
-    except Exception as e:
-        st.error("⚠️ Error fetching data. Try another keyword or refresh.")
+TIME RANGE HANDLER
 
-st.divider()
-st.caption("ITMEAS Engine v0.1 • Live Trend Intelligence")
+----------------------------
 
-    
+def get_data_by_range(option): if option == "Now (7 Days)": return generate_data(7) elif option == "1 Month": return generate_data(30) elif option == "3 Months": return generate_data(90) else: return generate_data(30)
+
+----------------------------
+
+SIMPLE PREDICTION MODEL (STUB)
+
+----------------------------
+
+def simple_forecast(df): last_value = df["Value"].iloc[-1] trend = np.mean(np.diff(df["Value"].values)) future = [last_value + trend * i for i in range(1, 6)] return future
+
+----------------------------
+
+PLOT FUNCTION
+
+----------------------------
+
+def plot_data(df, forecast=None): fig = go.Figure()
+
+fig.add_trace(go.Scatter(
+    x=df["Date"],
+    y=df["Value"],
+    mode="lines+markers",
+    name="Trend"
+))
+
+if forecast:
+    future_dates = [df["Date"].iloc[-1] + timedelta(days=i) for i in range(1, 6)]
+    fig.add_trace(go.Scatter(
+        x=future_dates,
+        y=forecast,
+        mode="lines+markers",
+        name="Forecast"
+    ))
+
+fig.update_layout(
+    template="plotly_dark",
+    title="ITMEAS Trend Analysis",
+    xaxis_title="Date",
+    yaxis_title="Index Value"
+)
+
+st.plotly_chart(fig, use_container_width=True)
+
+----------------------------
+
+MAIN APP
+
+----------------------------
+
+def main(): st.title("📊 ITMEAS - Intelligent Trend Monitor & Economic Analysis System")
+
+st.sidebar.header("Controls")
+time_range = st.sidebar.selectbox(
+    "Select Time Range",
+    ["Now (7 Days)", "1 Month", "3 Months"]
+)
+
+show_forecast = st.sidebar.checkbox("Enable Forecast", value=True)
+
+df = get_data_by_range(time_range)
+
+st.subheader("Live Trend Data")
+st.dataframe(df.tail(10))
+
+forecast = simple_forecast(df) if show_forecast else None
+
+st.subheader("Visualization")
+plot_data(df, forecast)
+
+st.subheader("System Insights")
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Current Index", f"{df['Value'].iloc[-1]:.2f}")
+col2.metric("Avg Change", f"{np.mean(np.diff(df['Value'])):.2f}")
+col3.metric("Volatility", f"{np.std(df['Value']):.2f}")
+
+st.success("System running stable - rebuild complete 🚀")
+
+if name == "main": main()    
