@@ -45,26 +45,32 @@ if keyword:
         pytrends.build_payload([keyword], timeframe=timeframe, geo=geo)
         data = pytrends.interest_over_time()
 
- if not data.empty:
-    st.subheader("📈 Trend Chart")
-    st.line_chart(data[keyword])
+        if not data.empty:
+            st.subheader("📈 Trend Chart")
+            st.line_chart(data[keyword])
 
-    score = int(data[keyword].mean())
+            score = int(data[keyword].mean())
 
-    st.subheader("📊 Trend Score")
+            st.subheader("📊 Trend Score")
 
-    col1, col2 = st.columns(2)
+            col1, col2 = st.columns(2)
 
-    with col1:
-        st.metric("Score", score)
+            with col1:
+                st.metric("Score", score)
 
-    with col2:
-        if score > 75:
-            st.success("🔥 High Demand")
-        elif score > 50:
-            st.info("📈 Growing Trend")
+            with col2:
+                if score > 75:
+                    st.success("🔥 High Demand")
+                elif score > 50:
+                    st.info("📈 Growing Trend")
+                else:
+                    st.warning("⚖️ Low Momentum")
+
         else:
-            st.warning("⚖️ Low Momentum")
+            st.warning("No trend data found. Try another keyword.")
+
+    except Exception:
+        st.error("⚠️ Error fetching data. Try again.")
         else:
             st.warning("No trend data found. Try another keyword.")
 
