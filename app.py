@@ -45,7 +45,7 @@ if keyword:
         pytrends.build_payload([keyword], timeframe=timeframe, geo=geo)
         data = pytrends.interest_over_time()
 
-        if not data.empty:
+if not data.empty:
     st.subheader("📈 Trend Chart")
     st.line_chart(data[keyword])
 
