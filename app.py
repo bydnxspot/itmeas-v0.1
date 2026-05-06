@@ -65,10 +65,9 @@ if keyword:
                     st.info("📈 Growing Trend")
                 else:
                     st.warning("⚖️ Low Momentum")
-
-        else:
-            st.warning("No trend data found. Try another keyword.")
-
+                else:
+                    st.warning("No trend data found. Try another keyword.")
+                    
     except Exception:
         st.error("⚠️ Error fetching data. Try again.")
         else:
@@ -79,3 +78,5 @@ if keyword:
 
 st.divider()
 st.caption("ITMEAS Engine v0.1 • Live Trend Intelligence")
+
+    
