@@ -1,0 +1,29 @@
+import { calculateTrendScore } from '../lib/trendScore'
+import type { Alert, DataSource, Indicator, Insight, Prediction, Trend } from '../types'
+const series = (start: number, drift: number) => ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'].map((label, index) => ({ label, value: Math.round(start + index * drift + (index % 3 - 1) * start * 0.08) }))
+const trendBase = [['Agentic AI', 'agentic ai', 'AI', 'Global', 'United States', 88640, 38.2, 92, 'Positive'], ['Nigeria fintech rails', 'nigeria fintech', 'Finance', 'West Africa', 'Nigeria', 57420, 24.8, 74, 'Positive'], ['Bitcoin ETF flows', 'bitcoin etf', 'Cryptocurrency', 'Global', 'United States', 72180, -12.4, 69, 'Neutral'], ['Grid-scale storage', 'energy storage', 'Science', 'Europe', 'United Kingdom', 31400, 44.8, 81, 'Positive'], ['Consumer price pressure', 'consumer prices', 'Business', 'Global', 'United Kingdom', 28360, 17.1, 57, 'Negative']] as const
+export const trends: Trend[] = trendBase.map(([title, keyword, category, region, country, popularity, change, velocity, sentiment], index) => ({ id: `trend-${index + 1}`, title, keyword, category, source: 'Demo aggregation', region, country, popularity, previousPopularity: Math.round(popularity / (1 + change / 100)), change, velocity, sentiment, confidence: 72 + index * 5, score: calculateTrendScore({ popularity, growth: Math.max(change, 0), acceleration: velocity, engagement: popularity * .55, sourceCount: 2 + index, sentimentSignificance: sentiment === 'Neutral' ? 35 : 75 }), updatedAt: 'Updated 8 min ago', history: series(popularity * .34, popularity * (change / 100) * .08) }))
+export const indicators: Indicator[] = [
+ { id: 'ng-inflation', name: 'Inflation', country: 'Nigeria', value: '24.48', unit: '%', change: -0.62, sentiment: 'Negative', history: series(19.2, .7).map((d) => ({ ...d, date: d.label, country: 'Nigeria', indicator: 'Inflation' })) },
+ { id: 'us-inflation', name: 'Inflation', country: 'United States', value: '2.80', unit: '%', change: .1, sentiment: 'Neutral', history: series(3.4, -.08).map((d) => ({ ...d, date: d.label, country: 'United States', indicator: 'Inflation' })) },
+ { id: 'ng-fx', name: 'NGN / USD', country: 'Nigeria', value: '1,486', unit: '₦', change: 1.6, sentiment: 'Negative', history: series(1288, 26).map((d) => ({ ...d, date: d.label, country: 'Nigeria', indicator: 'Exchange rate' })) },
+ { id: 'oil', name: 'Brent crude', country: 'Global', value: '78.42', unit: '$', change: 2.1, sentiment: 'Neutral', history: series(70, 1.15).map((d) => ({ ...d, date: d.label, country: 'Global', indicator: 'Oil' })) },
+]
+export const alerts: Alert[] = [
+ { id: 'a1', title: 'Unusual acceleration detected', description: 'Agentic AI mentions are rising faster than their 30-day baseline.', type: 'Anomaly', severity: 'HIGH', relatedTo: 'Agentic AI', recommendedAction: 'Review the cross-source breakdown before updating your thesis.', read: false, timestamp: '12 min ago' },
+ { id: 'a2', title: 'FX watch threshold reached', description: 'NGN / USD crossed the configured 1,480 monitoring threshold.', type: 'Currency movement', severity: 'MEDIUM', relatedTo: 'NGN / USD', recommendedAction: 'Compare with inflation and oil signals.', read: false, timestamp: '42 min ago' },
+ { id: 'a3', title: 'Momentum weakening', description: 'Bitcoin ETF flow discussions have decelerated across monitored sources.', type: 'Trend movement', severity: 'LOW', relatedTo: 'Bitcoin ETF flows', recommendedAction: 'Keep on watchlist; no action is implied.', read: true, timestamp: '2 h ago' },
+]
+export const insights: Insight[] = [
+ { id: 'i1', title: 'Automation interest is broadening beyond product launches', summary: 'The signal is broadening from developer discussion into operations and finance conversations.', fact: 'Demo dataset: cross-source mentions of “agentic AI” increased 38.2% in the sampled window.', signal: 'Positive sentiment and rising velocity appear in four demo sources.', interpretation: 'AI interpretation: the pattern may indicate broader enterprise evaluation, not confirmed adoption.', risk: 'MEDIUM', opportunity: 'HIGH', confidence: 82, updatedAt: 'Generated 8 min ago' },
+ { id: 'i2', title: 'Nigerian fintech conversations align with FX concern', summary: 'Growth in payment-infrastructure attention coincides with a weaker currency signal in this demo.', fact: 'Demo dataset: NGN / USD moved 1.6% while fintech trend attention increased 24.8%.', signal: 'The two series moved together during the selected period.', interpretation: 'AI interpretation: teams may be discussing resilience and payment routing; causality is unproven.', risk: 'MEDIUM', opportunity: 'HIGH', confidence: 71, updatedAt: 'Generated 26 min ago' },
+]
+export const predictions: Prediction[] = [
+ { id: 'p1', prediction: 'Agentic AI is likely to remain above its 30-day interest baseline.', probability: 76, timeframe: 'Next 7 days', signals: ['Positive velocity', 'Cross-source presence', 'Rising engagement'], uncertainty: 'Demo heuristic, not a guarantee; news cycles can reverse momentum.', timestamp: '8 min ago' },
+ { id: 'p2', prediction: 'Grid-scale storage may enter the top emerging-energy cohort.', probability: 68, timeframe: 'Next 14 days', signals: ['44.8% demo growth', 'High trend score'], uncertainty: 'Source coverage is limited in demo mode.', timestamp: '31 min ago' },
+]
+export const sources: DataSource[] = [
+ { id: 's1', name: 'Trend aggregation', type: 'TrendProvider', status: 'DEMO', lastUpdated: '8 min ago', message: 'Synthetic but realistic trend movements' },
+ { id: 's2', name: 'Macroeconomic series', type: 'EconomicProvider', status: 'DEMO', lastUpdated: '1 h ago', message: 'Demo observations; no live provider credential configured' },
+ { id: 's3', name: 'AI analysis', type: 'AIProvider', status: 'DEMO', lastUpdated: '8 min ago', message: 'Safe explanatory template; OpenAI not configured' },
+]

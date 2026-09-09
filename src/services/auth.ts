@@ -1,0 +1,4 @@
+import { supabase } from '../lib/supabase'
+export async function signIn(email: string, password: string) { if (!supabase) return { demo: true, user: { email } }; const { data, error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; return { demo: false, user: data.user } }
+export async function signUp(email: string, password: string) { if (!supabase) return { demo: true, message: 'Demo mode does not create accounts. Configure Supabase to enable registration.' }; const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/login` } }); if (error) throw error; return { demo: false } }
+export async function resetPassword(email: string) { if (!supabase) return { demo: true }; const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/login` }); if (error) throw error; return { demo: false } }
